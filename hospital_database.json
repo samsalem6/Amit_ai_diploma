@@ -1,0 +1,63 @@
+{
+  "patients": [
+    {
+      "name": "sameer",
+      "age": 24,
+      "condition": "Stroke",
+      "patient_number": "1001",
+      "room_number": 44,
+      "procedures": [
+        {
+          "date": "2025-06-12",
+          "description": "Appendectomy",
+          "billed": true
+        }
+      ],
+      "billing": [
+        {
+          "amount": 1200.0,
+          "description": "Emergencies",
+          "paid": true
+        },
+        {
+          "amount": 100.0,
+          "description": "Procedure: Appendectomy on 2025-06-12",
+          "paid": false
+        },
+        {
+          "amount": 1200.0,
+          "description": "",
+          "paid": false
+        }
+      ],
+      "status": "normal"
+    },
+    {
+      "name": "ahmed",
+      "age": 34,
+      "condition": "Dehydration",
+      "patient_number": "1002",
+      "room_number": null,
+      "procedures": [],
+      "billing": [],
+      "status": "normal"
+    }
+  ],
+  "departments": {
+    "Emergency": {
+      "patients": [],
+      "staff": [
+        {
+          "name": "salem",
+          "age": 45,
+          "position": "doctor"
+        },
+        {
+          "name": "farah",
+          "age": 30,
+          "position": "nurse"
+        }
+      ]
+    }
+  }
+}
