@@ -53,7 +53,7 @@ A command-line based Hospital Management System for managing patients, staff, de
 - `hospital_database.json` — Data storage (auto-generated)
 
 ## Credits
-- Developed by Salem (and contributors)
+- Developed by Salem Sameer and Mohamed Gamal (and contributors)
 - Powered by Python 3 and PrettyTable
 
 ---
