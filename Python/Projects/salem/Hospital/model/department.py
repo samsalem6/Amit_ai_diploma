@@ -8,8 +8,10 @@ Attributes:
 class Department:
     def __init__(self, name):
         self.name = name
+        self.doctors = []
+        self.nurses = []
+        self.staff = []  # Optional: keep for backward compatibility
         self.patients = []
-        self.staff = []
 
     def add_patient(self, patient):
         """
@@ -28,3 +30,21 @@ class Department:
         """
         self.staff.append(staff_member)
         print(f"Staff '{staff_member.name}' added to {self.name} department.")
+
+    def add_doctor(self, doctor):
+        self.doctors.append(doctor)
+        self.staff.append(doctor)
+        print(f"Doctor '{doctor.name}' added to {self.name} department.")
+
+    def add_nurse(self, nurse):
+        self.nurses.append(nurse)
+        self.staff.append(nurse)
+        print(f"Nurse '{nurse.name}' added to {self.name} department.")
+
+    def assign_patient_to_doctor(self, patient, doctor):
+        if doctor in self.doctors:
+            doctor.add_patient(patient)
+            self.patients.append(patient)
+            print(f"Patient '{patient.name}' assigned to Doctor '{doctor.name}' in {self.name} department.")
+        else:
+            print(f"Doctor '{doctor.name}' is not in {self.name} department.")
