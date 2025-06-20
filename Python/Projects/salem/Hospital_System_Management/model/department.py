@@ -10,7 +10,7 @@ class Department:
         self.name = name
         self.doctors = []
         self.nurses = []
-        self.staff = []  # Optional: keep for backward compatibility
+        self.staff = []
         self.patients = []
 
     def add_patient(self, patient):
