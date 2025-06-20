@@ -41,4 +41,15 @@ class Billing:
         Returns:
             Billing: A Billing object created from the dictionary data.
         """
-        return Billing(data['amount'], data['description'], data.get('paid', False)) 
+        return Billing(data['amount'], data['description'], data.get('paid', False))
+
+    def get_discounted_amount(self, insurance_coverage_percent=0):
+        """
+        Calculate the amount after applying insurance discount.
+        Args:
+            insurance_coverage_percent (float): The percent of the bill covered by insurance (0-100).
+        Returns:
+            float: The discounted amount to be paid by the patient.
+        """
+        discount = (insurance_coverage_percent / 100) * self.amount
+        return self.amount - discount 

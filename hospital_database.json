@@ -19,11 +19,27 @@
       "address": "cairo, Egypr",
       "identifier": "98538475835983",
       "procedures": [],
-      "billing": [],
+      "billing": [
+        {
+          "amount": 1200.0,
+          "description": "general",
+          "paid": false
+        },
+        {
+          "amount": 2700.0,
+          "description": "surgery (after 10.0% insurance discount)",
+          "paid": false
+        }
+      ],
       "status": "normal",
       "register_date": "2025-06-20",
       "discharge_date": null,
-      "date_of_death": null
+      "date_of_death": null,
+      "insurance": {
+        "provider": "alainze",
+        "policy_number": "893829",
+        "coverage_percent": 10.0
+      }
     },
     {
       "name": "foad",
@@ -48,7 +64,12 @@
       "status": "normal",
       "register_date": "2025-06-20",
       "discharge_date": null,
-      "date_of_death": null
+      "date_of_death": null,
+      "insurance": {
+        "provider": "",
+        "policy_number": "",
+        "coverage_percent": 0
+      }
     },
     {
       "name": "sameh",
@@ -73,7 +94,12 @@
       "status": "normal",
       "register_date": "2025-06-20",
       "discharge_date": null,
-      "date_of_death": null
+      "date_of_death": null,
+      "insurance": {
+        "provider": "",
+        "policy_number": "",
+        "coverage_percent": 0
+      }
     },
     {
       "name": "salma",
@@ -98,7 +124,12 @@
       "status": "normal",
       "register_date": "2025-06-20",
       "discharge_date": null,
-      "date_of_death": null
+      "date_of_death": null,
+      "insurance": {
+        "provider": "",
+        "policy_number": "",
+        "coverage_percent": 0
+      }
     },
     {
       "name": "gamal",
@@ -123,7 +154,12 @@
       "status": "normal",
       "register_date": "2025-06-20",
       "discharge_date": null,
-      "date_of_death": null
+      "date_of_death": null,
+      "insurance": {
+        "provider": "",
+        "policy_number": "",
+        "coverage_percent": 0
+      }
     },
     {
       "name": "samar",
@@ -148,7 +184,12 @@
       "status": "normal",
       "register_date": "2025-06-20",
       "discharge_date": null,
-      "date_of_death": null
+      "date_of_death": null,
+      "insurance": {
+        "provider": "",
+        "policy_number": "",
+        "coverage_percent": 0
+      }
     }
   ],
   "departments": {
@@ -158,13 +199,13 @@
         {
           "name": "salem",
           "age": 45,
-          "position": "93289328387433",
-          "phone_number": "doctor",
-          "date_of_birth": "8479348",
-          "gender": "1989",
-          "email": "male",
-          "address": "salem@gmail.com",
-          "identifier": "cairo, egypt"
+          "position": "salem@gmail.com",
+          "phone_number": "cairo, egypt",
+          "date_of_birth": "93289328387433",
+          "gender": "doctor",
+          "email": "8479348",
+          "address": "1989",
+          "identifier": "male"
         }
       ]
     },

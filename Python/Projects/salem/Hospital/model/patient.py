@@ -15,10 +15,11 @@ Attributes:
     register_date (str, optional): The date of registration of the patient.
     discharge_date (str, optional): The date of discharge of the patient.
     date_of_death (str, optional): The date of death of the patient.
+    insurance (dict): Insurance information for the patient.
 """
 
 class Patient(Person):
-    def __init__(self, name, age, condition, patient_number, phone_number, date_of_birth, gender, email, address, identifier, patient_next_of_kin, room_number=None, procedures=None, billing=None, status='normal', register_date=None, discharge_date=None, date_of_death=None):
+    def __init__(self, name, age, condition, patient_number, phone_number, date_of_birth, gender, email, address, identifier, patient_next_of_kin, room_number=None, procedures=None, billing=None, status='normal', register_date=None, discharge_date=None, date_of_death=None, insurance=None):
         super().__init__(name, age, phone_number, date_of_birth, gender, email, address, identifier)
         self.condition = condition
         self.patient_number = patient_number
@@ -45,6 +46,15 @@ class Patient(Person):
         self.register_date = register_date
         self.discharge_date = discharge_date
         self.date_of_death = date_of_death
+        # Insurance info: dict with provider, policy_number, coverage_percent
+        if insurance is not None:
+            self.insurance = {
+                'provider': insurance.get('provider', ''),
+                'policy_number': insurance.get('policy_number', ''),
+                'coverage_percent': insurance.get('coverage_percent', 0)
+            }
+        else:
+            self.insurance = {'provider': '', 'policy_number': '', 'coverage_percent': 0}
 
     def add_bill(self, bill):
         """
@@ -113,6 +123,7 @@ class Patient(Person):
             'register_date': self.register_date,
             'discharge_date': self.discharge_date,
             'date_of_death': self.date_of_death,
+            'insurance': self.insurance,
         }
 
     @staticmethod
@@ -144,4 +155,5 @@ class Patient(Person):
             register_date=data.get('register_date'),
             discharge_date=data.get('discharge_date'),
             date_of_death=data.get('date_of_death'),
+            insurance=data.get('insurance', {'provider': '', 'policy_number': '', 'coverage_percent': 0})
         )

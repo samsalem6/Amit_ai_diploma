@@ -43,7 +43,7 @@ class HospitalSystem:
         else:
             return '1001'
 
-    def add_patient(self, name, age, condition, phone_number, date_of_birth, gender, email, address, identifier, patient_next_of_kin, room_number=None):
+    def add_patient(self, name, age, condition, phone_number, date_of_birth, gender, email, address, identifier, patient_next_of_kin, room_number=None, insurance=None):
         """
         Add a new patient to the hospital system.
         Args:
@@ -58,7 +58,7 @@ class HospitalSystem:
             identifier (str): Identifier of the patient.
             patient_next_of_kin (dict): Next of kin of the patient.
             room_number (int, optional): Room number to assign. Defaults to None.
-
+            insurance (dict, optional): Insurance info for the patient.
         Returns:
             Patient or None: The created Patient object, or None if duplicate found.
         """
@@ -73,7 +73,7 @@ class HospitalSystem:
                 print(f"Patient number '{patient_number}' already exists.")
                 return None
         register_date = datetime.datetime.now().strftime('%Y-%m-%d')
-        patient = Patient(name, age, condition, patient_number, phone_number, date_of_birth, gender, email, address, identifier, patient_next_of_kin, room_number=room_number, register_date=register_date)
+        patient = Patient(name, age, condition, patient_number, phone_number, date_of_birth, gender, email, address, identifier, patient_next_of_kin, room_number=room_number, register_date=register_date, insurance=insurance)
         self.patients.append(patient)
         if room_number:
             self.rooms[room_number] = name
@@ -95,15 +95,22 @@ class HospitalSystem:
 
     def generate_bill(self, patient, amount, description):
         """
-        Generate a bill for a patient.
+        Generate a bill for a patient, applying insurance discount if available.
         Args:
             patient (Patient): The patient to bill.
             amount (float): The amount to bill.
             description (str): Description of the bill.
         """
-        bill = Billing(amount, description)
+        insurance_coverage = 0
+        if hasattr(patient, 'insurance') and patient.insurance.get('coverage_percent', 0) > 0:
+            insurance_coverage = patient.insurance['coverage_percent']
+            discounted_amount = Billing(amount, description).get_discounted_amount(insurance_coverage)
+            bill = Billing(discounted_amount, f"{description} (after {insurance_coverage}% insurance discount)")
+            print(f"Bill generated for {patient.name}: {amount} - {description}\nInsurance applied: {insurance_coverage}%\nAmount after insurance: {discounted_amount}")
+        else:
+            bill = Billing(amount, description)
+            print(f"Bill generated for {patient.name}: {amount} - {description}")
         patient.add_bill(bill)
-        print(f"Bill generated for {patient.name}: {amount} - {description}")
         self.save_data()
 
     def view_bills(self, patient):
@@ -262,6 +269,21 @@ class HospitalSystem:
             new_date_of_death = None
         new_register_date = input(f"Register date (YYYY-MM-DD, leave blank to keep '{getattr(patient, 'register_date', None)}'): ") or getattr(patient, 'register_date', None)
         new_discharge_date = input(f"Discharge date (YYYY-MM-DD, leave blank to keep '{getattr(patient, 'discharge_date', None)}'): ") or getattr(patient, 'discharge_date', None)
+        # Insurance info
+        has_insurance = input("Does the patient have insurance? (yes/no, leave blank to keep current): ").strip().lower()
+        if has_insurance in ['no', 'n']:
+            new_insurance = {'provider': '', 'policy_number': '', 'coverage_percent': 0}
+        elif has_insurance in ['yes', 'y']:
+            ins = patient.insurance if isinstance(patient.insurance, dict) else {'provider': '', 'policy_number': '', 'coverage_percent': 0}
+            provider = input(f"Insurance provider (leave blank to keep '{ins.get('provider','')}'): ") or ins.get('provider','')
+            policy_number = input(f"Policy number (leave blank to keep '{ins.get('policy_number','')}'): ") or ins.get('policy_number','')
+            try:
+                coverage_percent = float(input(f"Coverage percent (0-100, leave blank to keep '{ins.get('coverage_percent',0)}'): ") or ins.get('coverage_percent',0))
+            except ValueError:
+                coverage_percent = ins.get('coverage_percent',0)
+            new_insurance = {'provider': provider, 'policy_number': policy_number, 'coverage_percent': coverage_percent}
+        else:
+            new_insurance = patient.insurance
         patient.name = new_name
         patient.age = int(new_age)
         patient.phone_number = new_phone_number
@@ -276,6 +298,7 @@ class HospitalSystem:
         patient.date_of_death = new_date_of_death
         patient.register_date = new_register_date
         patient.discharge_date = new_discharge_date
+        patient.insurance = new_insurance
         print("Patient updated.")
         self.save_data()
 
@@ -477,7 +500,19 @@ class HospitalSystem:
                     patient_next_of_kin = {'name': kin_name, 'number': kin_number, 'email': kin_email, 'relation': kin_relation}
                 else:
                     patient_next_of_kin = None
-                self.add_patient(name, age, condition, phone_number, date_of_birth, gender, email, address, identifier, patient_next_of_kin, room)
+                # Insurance info
+                has_insurance = input("Does the patient have insurance? (yes/no): ").strip().lower()
+                if has_insurance in ['yes', 'y']:
+                    provider = input("Insurance provider: ")
+                    policy_number = input("Policy number: ")
+                    try:
+                        coverage_percent = float(input("Coverage percent (0-100): "))
+                    except ValueError:
+                        coverage_percent = 0
+                    insurance = {'provider': provider, 'policy_number': policy_number, 'coverage_percent': coverage_percent}
+                else:
+                    insurance = {'provider': '', 'policy_number': '', 'coverage_percent': 0}
+                self.add_patient(name, age, condition, phone_number, date_of_birth, gender, email, address, identifier, patient_next_of_kin, room, insurance)
             elif choice == '4':
                 identifier = input("Patient name or number to assign room: ")
                 room = int(input("Room number: "))
