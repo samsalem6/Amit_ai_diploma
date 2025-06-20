@@ -1,6 +1,7 @@
 import json
 import random
 from model import Patient, Billing, Department, Staff
+from model.staff import Doctor, Nurse
 from prettytable import PrettyTable
 import datetime
 
@@ -138,7 +139,7 @@ class HospitalSystem:
         else:
             print(f"Department '{name}' already exists.")
 
-    def add_staff_to_department(self, dept_name, staff_name, staff_age, staff_position, staff_phone_number, staff_date_of_birth, staff_gender, staff_email, staff_address, staff_identifier):
+    def add_staff_to_department(self, dept_name, staff_name, staff_age, staff_position, staff_phone_number, staff_date_of_birth, staff_gender, staff_email, staff_address, staff_identifier, specialty=None):
         """
         Add a staff member to a department, creating the department if it does not exist.
         Args:
@@ -152,27 +153,86 @@ class HospitalSystem:
             staff_address (str): Address of the staff member.
             staff_identifier (str): Identifier of the staff member.
             staff_position (str): Position/job title of the staff member.
+            specialty (str, optional): Specialty for doctors.
         """
         if dept_name not in self.departments:
             print(f"Department '{dept_name}' does not exist. Creating it.")
             self.add_department(dept_name)
-        staff = Staff(staff_name, staff_age, staff_position, staff_phone_number, staff_date_of_birth, staff_gender, staff_email, staff_address, staff_identifier)
-        self.departments[dept_name].add_staff(staff)
+        if staff_position.lower() == 'doctor':
+            doctor = Doctor(staff_name, staff_age, staff_phone_number, staff_date_of_birth, staff_gender, staff_email, staff_address, staff_identifier, specialty or "General")
+            self.departments[dept_name].add_doctor(doctor)
+        elif staff_position.lower() == 'nurse':
+            nurse = Nurse(staff_name, staff_age, staff_phone_number, staff_date_of_birth, staff_gender, staff_email, staff_address, staff_identifier, dept_name)
+            self.departments[dept_name].add_nurse(nurse)
+        else:
+            staff = Staff(staff_name, staff_age, staff_phone_number, staff_date_of_birth, staff_gender, staff_email, staff_address, staff_identifier, staff_position)
+            self.departments[dept_name].add_staff(staff)
         self.save_data()
+
+    def assign_patient_to_doctor_in_department(self, dept_name, doctor_name, patient):
+        """
+        Assign a patient to a doctor in a department.
+        Args:
+            dept_name (str): Name of the department.
+            doctor_name (str): Name of the doctor.
+            patient (Patient): Patient object to assign.
+        """
+        if dept_name in self.departments:
+            doctor = next((d for d in self.departments[dept_name].doctors if d.name == doctor_name), None)
+            if doctor:
+                self.departments[dept_name].assign_patient_to_doctor(patient, doctor)
+                self.save_data()
+            else:
+                print(f"Doctor '{doctor_name}' not found in department '{dept_name}'.")
+        else:
+            print(f"Department '{dept_name}' does not exist.")
 
     def view_department_staff(self, dept_name):
         """
-        View all staff members in a department.
+        View all staff members in a department, showing doctors and nurses separately.
         Args:
             dept_name (str): Name of the department.
         """
         if dept_name in self.departments:
-            staff_list = self.departments[dept_name].staff
-            if staff_list:
-                for s in staff_list:
-                    print(s.view_info())
+            dept = self.departments[dept_name]
+            if dept.doctors:
+                print(f"Doctors in {dept_name}:")
+                for d in dept.doctors:
+                    print(d.view_info())
             else:
-                print(f"No staff in department '{dept_name}'.")
+                print(f"No doctors in department '{dept_name}'.")
+            if dept.nurses:
+                print(f"Nurses in {dept_name}:")
+                for n in dept.nurses:
+                    print(n.view_info())
+            else:
+                print(f"No nurses in department '{dept_name}'.")
+            other_staff = [s for s in dept.staff if s.position.lower() not in ['doctor', 'nurse']]
+            if other_staff:
+                print(f"Other staff in {dept_name}:")
+                for s in other_staff:
+                    print(s.view_info())
+        else:
+            print(f"Department '{dept_name}' does not exist.")
+
+    def view_doctor_patients(self, dept_name, doctor_name):
+        """
+        View all patients assigned to a doctor in a department.
+        Args:
+            dept_name (str): Name of the department.
+            doctor_name (str): Name of the doctor.
+        """
+        if dept_name in self.departments:
+            doctor = next((d for d in self.departments[dept_name].doctors if d.name == doctor_name), None)
+            if doctor:
+                if doctor.patients:
+                    print(f"Patients of Dr. {doctor.name}:")
+                    for p in doctor.patients:
+                        print(f"{p.name} (Number: {p.patient_number})")
+                else:
+                    print(f"No patients assigned to Dr. {doctor.name}.")
+            else:
+                print(f"Doctor '{doctor_name}' not found in department '{dept_name}'.")
         else:
             print(f"Department '{dept_name}' does not exist.")
 
@@ -460,8 +520,10 @@ class HospitalSystem:
             print("18. Generate Bills from Procedures")
             print("19. Save Data")
             print("20. Exit")
+            print("21. Assign Patient to Doctor")
+            print("22. View Doctor's Patients")
             print("-"*50)
-            choice = input("Select option (1-20): ")
+            choice = input("Select option (1-22): ")
             if choice == '1':
                 for p in self.patients:
                     details = f"Number: {p.patient_number}, Name: {p.name}, Age: {p.age}, Condition: {p.condition}, Identifier: {p.identifier}, Phone Number: {p.phone_number}, Date of Birth: {p.date_of_birth}, Gender: {p.gender}, Email: {p.email}, Address: {p.address}, Room: {p.room_number}, Bills: {len(p.billing)}, Status: {p.status}"
@@ -564,7 +626,8 @@ class HospitalSystem:
                 staff_email = input("Staff email: ")
                 staff_address = input("Staff address: ")
                 staff_identifier = input("Staff identifier: ")
-                self.add_staff_to_department(dept_name, staff_name, staff_age, staff_position, staff_phone_number, staff_date_of_birth, staff_gender, staff_email, staff_address, staff_identifier)
+                specialty = input("Specialty (leave blank for general): ") or None
+                self.add_staff_to_department(dept_name, staff_name, staff_age, staff_position, staff_phone_number, staff_date_of_birth, staff_gender, staff_email, staff_address, staff_identifier, specialty)
             elif choice == '10':
                 dept_name = input("Department name: ")
                 self.view_department_staff(dept_name)
@@ -631,5 +694,18 @@ class HospitalSystem:
                     self.save_data()
                 print("Goodbye!")
                 break
+            elif choice == '21':
+                dept_name = input("Department name: ")
+                doctor_name = input("Doctor's name: ")
+                patient_identifier = input("Patient name or number to assign: ")
+                patient = self.find_patient(patient_identifier)
+                if patient:
+                    self.assign_patient_to_doctor_in_department(dept_name, doctor_name, patient)
+                else:
+                    print("Patient not found.")
+            elif choice == '22':
+                dept_name = input("Department name: ")
+                doctor_name = input("Doctor's name: ")
+                self.view_doctor_patients(dept_name, doctor_name)
             else:
                 print("Invalid choice.")
