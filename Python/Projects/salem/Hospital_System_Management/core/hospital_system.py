@@ -63,7 +63,7 @@ class HospitalSystem:
         Returns:
             Patient or None: The created Patient object, or None if duplicate found.
         """
-        # Prevent duplicate by name or patient_number
+        # Prevent duplicate by identifier or patient_number
         for p in self.patients:
             if p.identifier == identifier:
                 print(f"Patient with identifier '{identifier}' already exists.")
