@@ -12,13 +12,26 @@ Attributes:
     procedures (list): List of procedures for the patient, each with a 'billed' flag.
     billing (list): List of Billing objects associated with the patient.
     status (str): The current status of the patient.
+    register_date (str, optional): The date of registration of the patient.
+    discharge_date (str, optional): The date of discharge of the patient.
+    date_of_death (str, optional): The date of death of the patient.
 """
 
 class Patient(Person):
-    def __init__(self, name, age, condition, patient_number, room_number=None, procedures=None, billing=None, status='normal'):
-        super().__init__(name, age)
+    def __init__(self, name, age, condition, patient_number, phone_number, date_of_birth, gender, email, address, identifier, patient_next_of_kin, room_number=None, procedures=None, billing=None, status='normal', register_date=None, discharge_date=None, date_of_death=None):
+        super().__init__(name, age, phone_number, date_of_birth, gender, email, address, identifier)
         self.condition = condition
         self.patient_number = patient_number
+        # Ensure next_of_kin is a dict with required keys
+        if isinstance(patient_next_of_kin, dict):
+            self.patient_next_of_kin = {
+                'name': patient_next_of_kin.get('name', ''),
+                'number': patient_next_of_kin.get('number', ''),
+                'email': patient_next_of_kin.get('email', ''),
+                'relation': patient_next_of_kin.get('relation', '')
+            }
+        else:
+            self.patient_next_of_kin = {'name': '', 'number': '', 'email': '', 'relation': ''}
         self.room_number = room_number
         # Ensure all procedures have a 'billed' flag
         if procedures is not None:
@@ -29,6 +42,9 @@ class Patient(Person):
             self.procedures = []
         self.billing = billing if billing is not None else []
         self.status = status
+        self.register_date = register_date
+        self.discharge_date = discharge_date
+        self.date_of_death = date_of_death
 
     def add_bill(self, bill):
         """
@@ -83,10 +99,20 @@ class Patient(Person):
             'age': self.age,
             'condition': self.condition,
             'patient_number': self.patient_number,
+            'patient_next_of_kin': self.patient_next_of_kin,
             'room_number': self.room_number,
+            'phone_number': self.phone_number,
+            'date_of_birth': self.date_of_birth,
+            'gender': self.gender,
+            'email': self.email,
+            'address': self.address,
+            'identifier': self.identifier,
             'procedures': self.procedures,
             'billing': [b.to_dict() for b in self.billing],
-            'status': self.status
+            'status': self.status,
+            'register_date': self.register_date,
+            'discharge_date': self.discharge_date,
+            'date_of_death': self.date_of_death,
         }
 
     @staticmethod
@@ -104,8 +130,18 @@ class Patient(Person):
             data['age'],
             data['condition'],
             data['patient_number'],
+            data['phone_number'],
+            data['date_of_birth'],
+            data['gender'],
+            data['email'],
+            data['address'],
+            data['identifier'],
+            data.get('patient_next_of_kin', {'name': '', 'number': '', 'email': '', 'relation': ''}),
             room_number=data.get('room_number'),
             procedures=data.get('procedures', []),
             billing=billing,
-            status=data.get('status', 'normal')
+            status=data.get('status', 'normal'),
+            register_date=data.get('register_date'),
+            discharge_date=data.get('discharge_date'),
+            date_of_death=data.get('date_of_death'),
         )

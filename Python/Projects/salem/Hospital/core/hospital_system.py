@@ -2,6 +2,7 @@ import json
 import random
 from model import Patient, Billing, Department, Staff
 from prettytable import PrettyTable
+import datetime
 
 """
 Main class for managing the hospital system, including patients, rooms, departments, and staff.
@@ -42,13 +43,20 @@ class HospitalSystem:
         else:
             return '1001'
 
-    def add_patient(self, name, age, condition, room_number=None):
+    def add_patient(self, name, age, condition, phone_number, date_of_birth, gender, email, address, identifier, patient_next_of_kin, room_number=None):
         """
         Add a new patient to the hospital system.
         Args:
             name (str): Name of the patient.
             age (int): Age of the patient.
             condition (str): Medical condition of the patient.
+            phone_number (str): Phone number of the patient.
+            date_of_birth (str): Date of birth of the patient.
+            gender (str): Gender of the patient.
+            email (str): Email of the patient.
+            address (str): Address of the patient.
+            identifier (str): Identifier of the patient.
+            patient_next_of_kin (dict): Next of kin of the patient.
             room_number (int, optional): Room number to assign. Defaults to None.
 
         Returns:
@@ -56,15 +64,16 @@ class HospitalSystem:
         """
         # Prevent duplicate by name or patient_number
         for p in self.patients:
-            if p.name == name:
-                print(f"Patient with name '{name}' already exists.")
+            if p.identifier == identifier:
+                print(f"Patient with identifier '{identifier}' already exists.")
                 return None
         patient_number = self.generate_patient_number()
         for p in self.patients:
             if str(p.patient_number) == str(patient_number):
                 print(f"Patient number '{patient_number}' already exists.")
                 return None
-        patient = Patient(name, age, condition, patient_number, room_number=room_number)
+        register_date = datetime.datetime.now().strftime('%Y-%m-%d')
+        patient = Patient(name, age, condition, patient_number, phone_number, date_of_birth, gender, email, address, identifier, patient_next_of_kin, room_number=room_number, register_date=register_date)
         self.patients.append(patient)
         if room_number:
             self.rooms[room_number] = name
@@ -122,19 +131,25 @@ class HospitalSystem:
         else:
             print(f"Department '{name}' already exists.")
 
-    def add_staff_to_department(self, dept_name, staff_name, staff_age, staff_position):
+    def add_staff_to_department(self, dept_name, staff_name, staff_age, staff_position, staff_phone_number, staff_date_of_birth, staff_gender, staff_email, staff_address, staff_identifier):
         """
         Add a staff member to a department, creating the department if it does not exist.
         Args:
             dept_name (str): Name of the department.
             staff_name (str): Name of the staff member.
             staff_age (int): Age of the staff member.
+            staff_phone_number (str): Phone number of the staff member.
+            staff_date_of_birth (str): Date of birth of the staff member.
+            staff_gender (str): Gender of the staff member.
+            staff_email (str): Email of the staff member.
+            staff_address (str): Address of the staff member.
+            staff_identifier (str): Identifier of the staff member.
             staff_position (str): Position/job title of the staff member.
         """
         if dept_name not in self.departments:
             print(f"Department '{dept_name}' does not exist. Creating it.")
             self.add_department(dept_name)
-        staff = Staff(staff_name, staff_age, staff_position)
+        staff = Staff(staff_name, staff_age, staff_position, staff_phone_number, staff_date_of_birth, staff_gender, staff_email, staff_address, staff_identifier)
         self.departments[dept_name].add_staff(staff)
         self.save_data()
 
@@ -172,7 +187,7 @@ class HospitalSystem:
                 name: {
                     'patients': [getattr(p, 'name', str(p)) for p in dept.patients],
                     'staff': [
-                        {'name': s.name, 'age': s.age, 'position': s.position}
+                        {'name': s.name, 'age': s.age, 'position': s.position, 'phone_number': s.phone_number, 'date_of_birth': s.date_of_birth, 'gender': s.gender, 'email': s.email, 'address': s.address, 'identifier': s.identifier }
                         for s in dept.staff
                     ]
                 } for name, dept in self.departments.items()
@@ -202,7 +217,7 @@ class HospitalSystem:
                 for name, dept in data.get('departments', {}).items():
                     department = Department(name)
                     for s in dept.get('staff', []):
-                        staff = Staff(s['name'], s['age'], s['position'])
+                        staff = Staff(s['name'], s['age'], s['position'], s['phone_number'], s['date_of_birth'], s['gender'], s['email'], s['address'], s['identifier'])
                         department.add_staff(staff)
                     self.departments[name] = department
         except (FileNotFoundError, json.JSONDecodeError):
@@ -219,12 +234,48 @@ class HospitalSystem:
         print(f"Editing patient: {patient.name} (Number: {patient.patient_number})")
         new_name = input(f"New name (leave blank to keep '{patient.name}'): ") or patient.name
         new_age = input(f"New age (leave blank to keep '{patient.age}'): ") or patient.age
+        new_phone_number = input(f"New phone number (leave blank to keep '{patient.phone_number}'): ") or patient.phone_number
+        new_date_of_birth = input(f"New date of birth (leave blank to keep '{patient.date_of_birth}'): ") or patient.date_of_birth
+        new_gender = input(f"New gender (leave blank to keep '{patient.gender}'): ") or patient.gender
+        new_email = input(f"New email (leave blank to keep '{patient.email}'): ") or patient.email
+        new_address = input(f"New address (leave blank to keep '{patient.address}'): ") or patient.address
+        new_identifier = input(f"New identifier (leave blank to keep '{patient.identifier}'): ") or patient.identifier
         new_condition = input(f"New condition (leave blank to keep '{patient.condition}'): ") or patient.condition
-        new_status = input(f"New status (normal/surgery/emergency, leave blank to keep '{patient.status}'): ") or patient.status
+        new_status = input(f"New status (normal/surgery/emergency/death, leave blank to keep '{patient.status}'): ") or patient.status
+        # Next of kin logic
+        has_kin = input("Is there a next of kin? (yes/no, leave blank to keep current): ").strip().lower()
+        if has_kin in ['no', 'n']:
+            new_patient_next_of_kin = None
+        elif has_kin in ['yes', 'y']:
+            kin = patient.patient_next_of_kin if isinstance(patient.patient_next_of_kin, dict) else {'name': '', 'number': '', 'email': '', 'relation': ''}
+            kin_name = input(f"Next of kin name (leave blank to keep '{kin.get('name','')}'): ") or kin.get('name','')
+            kin_number = input(f"Next of kin number (leave blank to keep '{kin.get('number','')}'): ") or kin.get('number','')
+            kin_email = input(f"Next of kin email (leave blank to keep '{kin.get('email','')}'): ") or kin.get('email','')
+            kin_relation = input(f"Relation to patient (leave blank to keep '{kin.get('relation','')}'): ") or kin.get('relation','')
+            new_patient_next_of_kin = {'name': kin_name, 'number': kin_number, 'email': kin_email, 'relation': kin_relation}
+        else:
+            new_patient_next_of_kin = patient.patient_next_of_kin
+        new_date_of_death = patient.date_of_death
+        if new_status == 'death':
+            new_date_of_death = input(f"Date of death (YYYY-MM-DD, leave blank to keep '{patient.date_of_death}'): ") or patient.date_of_death
+        else:
+            new_date_of_death = None
+        new_register_date = input(f"Register date (YYYY-MM-DD, leave blank to keep '{getattr(patient, 'register_date', None)}'): ") or getattr(patient, 'register_date', None)
+        new_discharge_date = input(f"Discharge date (YYYY-MM-DD, leave blank to keep '{getattr(patient, 'discharge_date', None)}'): ") or getattr(patient, 'discharge_date', None)
         patient.name = new_name
         patient.age = int(new_age)
+        patient.phone_number = new_phone_number
+        patient.date_of_birth = new_date_of_birth
+        patient.gender = new_gender
+        patient.email = new_email
+        patient.address = new_address
+        patient.identifier = new_identifier
         patient.condition = new_condition
         patient.status = new_status
+        patient.patient_next_of_kin = new_patient_next_of_kin
+        patient.date_of_death = new_date_of_death
+        patient.register_date = new_register_date
+        patient.discharge_date = new_discharge_date
         print("Patient updated.")
         self.save_data()
 
@@ -249,9 +300,21 @@ class HospitalSystem:
         new_name = input(f"New name (leave blank to keep '{staff.name}'): ") or staff.name
         new_age = input(f"New age (leave blank to keep '{staff.age}'): ") or staff.age
         new_position = input(f"New position (leave blank to keep '{staff.position}'): ") or staff.position
+        new_phone_number = input(f"New phone number (leave blank to keep '{staff.phone_number}'): ") or staff.phone_number
+        new_date_of_birth = input(f"New date of birth (leave blank to keep '{staff.date_of_birth}'): ") or staff.date_of_birth
+        new_gender = input(f"New gender (leave blank to keep '{staff.gender}'): ") or staff.gender
+        new_email = input(f"New email (leave blank to keep '{staff.email}'): ") or staff.email
+        new_address = input(f"New address (leave blank to keep '{staff.address}'): ") or staff.address
+        new_identifier = input(f"New identifier (leave blank to keep '{staff.identifier}'): ") or staff.identifier
         staff.name = new_name
         staff.age = int(new_age)
         staff.position = new_position
+        staff.phone_number = new_phone_number
+        staff.date_of_birth = new_date_of_birth
+        staff.gender = new_gender
+        staff.email = new_email
+        staff.address = new_address
+        staff.identifier = new_identifier
         print("Staff updated.")
         self.save_data()
 
@@ -271,9 +334,13 @@ class HospitalSystem:
     def update_patient_status(self, name):
         patient = next((p for p in self.patients if p.name == name), None)
         if patient:
-            new_status = input(f"Enter new status for {name} (normal/surgery/emergency): ")
-            if new_status in ['normal', 'surgery', 'emergency']:
+            new_status = input(f"Enter new status for {name} (normal/surgery/emergency/death): ")
+            if new_status in ['normal', 'surgery', 'emergency', 'death']:
                 patient.status = new_status
+                if new_status == 'death':
+                    patient.date_of_death = input("Enter date of death (YYYY-MM-DD): ")
+                else:
+                    patient.date_of_death = None
                 print(f"Status updated to {new_status}.")
                 self.save_data()
             else:
@@ -374,7 +441,17 @@ class HospitalSystem:
             choice = input("Select option (1-20): ")
             if choice == '1':
                 for p in self.patients:
-                    print(f"Number: {p.patient_number}, Name: {p.name}, Age: {p.age}, Condition: {p.condition}, Room: {p.room_number}, Bills: {len(p.billing)}, Status: {p.status}")
+                    details = f"Number: {p.patient_number}, Name: {p.name}, Age: {p.age}, Condition: {p.condition}, Identifier: {p.identifier}, Phone Number: {p.phone_number}, Date of Birth: {p.date_of_birth}, Gender: {p.gender}, Email: {p.email}, Address: {p.address}, Room: {p.room_number}, Bills: {len(p.billing)}, Status: {p.status}"
+                    if getattr(p, 'register_date', None):
+                        details += f", Register Date: {p.register_date}"
+                    if getattr(p, 'discharge_date', None):
+                        details += f", Discharge Date: {p.discharge_date}"
+                    if isinstance(p.patient_next_of_kin, dict):
+                        kin = p.patient_next_of_kin
+                        details += f", Next of Kin: {kin.get('name','')} ({kin.get('relation','')}), Number: {kin.get('number','')}, Email: {kin.get('email','')}"
+                    if p.status == 'death' and p.date_of_death:
+                        details += f", Date of Death: {p.date_of_death}"
+                    print(details)
             elif choice == '2':
                 for room, name in self.rooms.items():
                     print(f"Room {room}: {name}")
@@ -382,24 +459,46 @@ class HospitalSystem:
                 name = input("Patient name: ")
                 age = int(input("Age: "))
                 condition = input("Condition: ")
+                phone_number = input("Phone number: ")
+                date_of_birth = input("Date of birth: ")
+                gender = input("Gender: ")
+                email = input("Email: ")
+                address = input("Address: ")
+                identifier = input("Patient identifier: ")
                 room = input("Room number (optional): ")
                 room = int(room) if room else None
-                self.add_patient(name, age, condition, room)
+                # Next of kin logic
+                has_kin = input("Is there a next of kin? (yes/no): ").strip().lower()
+                if has_kin in ['yes', 'y']:
+                    kin_name = input("Next of kin name: ")
+                    kin_number = input("Next of kin number: ")
+                    kin_email = input("Next of kin email: ")
+                    kin_relation = input("Relation to patient: ")
+                    patient_next_of_kin = {'name': kin_name, 'number': kin_number, 'email': kin_email, 'relation': kin_relation}
+                else:
+                    patient_next_of_kin = None
+                self.add_patient(name, age, condition, phone_number, date_of_birth, gender, email, address, identifier, patient_next_of_kin, room)
             elif choice == '4':
                 identifier = input("Patient name or number to assign room: ")
                 room = int(input("Room number: "))
                 patient = self.find_patient(identifier)
                 if patient:
-                    self.assign_room(patient, room)
+                    if patient.status == 'death':
+                        print("Cannot assign room: patient is deceased.")
+                    else:
+                        self.assign_room(patient, room)
                 else:
                     print("Patient not found.")
             elif choice == '5':
                 identifier = input("Patient name or number for billing: ")
                 patient = self.find_patient(identifier)
                 if patient:
-                    amount = float(input("Bill amount: "))
-                    desc = input("Description: ")
-                    self.generate_bill(patient, amount, desc)
+                    if patient.status == 'death':
+                        print("Cannot generate bill: patient is deceased.")
+                    else:
+                        amount = float(input("Bill amount: "))
+                        desc = input("Description: ")
+                        self.generate_bill(patient, amount, desc)
                 else:
                     print("Patient not found.")
             elif choice == '6':
@@ -424,7 +523,13 @@ class HospitalSystem:
                 staff_name = input("Staff name: ")
                 staff_age = int(input("Staff age: "))
                 staff_position = input("Staff position: ")
-                self.add_staff_to_department(dept_name, staff_name, staff_age, staff_position)
+                staff_phone_number = input("Staff phone number: ")
+                staff_date_of_birth = input("Staff date of birth: ")
+                staff_gender = input("Staff gender: ")
+                staff_email = input("Staff email: ")
+                staff_address = input("Staff address: ")
+                staff_identifier = input("Staff identifier: ")
+                self.add_staff_to_department(dept_name, staff_name, staff_age, staff_position, staff_phone_number, staff_date_of_birth, staff_gender, staff_email, staff_address, staff_identifier)
             elif choice == '10':
                 dept_name = input("Department name: ")
                 self.view_department_staff(dept_name)
@@ -441,6 +546,8 @@ class HospitalSystem:
                 if patient:
                     if patient.status == 'normal':
                         self.remove_patient(patient)
+                    elif patient.status == 'death':
+                        print("Cannot remove patient: patient is deceased. Record is kept for history.")
                     else:
                         print("Patient status is not normal.")
                 else:

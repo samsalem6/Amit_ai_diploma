@@ -8,14 +8,14 @@ Attributes:
     position (str): The position/job title of the staff member.
 """
 class Staff(Person):
-    def __init__(self, name, age, position):
-        super().__init__(name, age)
+    def __init__(self, name, age, phone_number, date_of_birth, gender, email, address, identifier, position):
+        super().__init__(name, age, phone_number, date_of_birth, gender, email, address, identifier)
         self.position = position
 
     def view_info(self):
         """
         View staff information.
         Returns:
-            str: String with the staff member's name, age, and position.
+            str: String with the staff member's name, age, and position and other information.
         """
-        return f"Staff Name: {self.name}, Age: {self.age}, Position: {self.position}"
+        return f"Staff Name: {self.name}, Age: {self.age}, Position: {self.position}, Phone Number: {self.phone_number}, Date of Birth: {self.date_of_birth}, Gender: {self.gender}, Email: {self.email}, Address: {self.address}, Identifier: {self.identifier}"

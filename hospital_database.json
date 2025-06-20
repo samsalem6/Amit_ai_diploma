@@ -2,62 +2,175 @@
   "patients": [
     {
       "name": "sameer",
-      "age": 24,
-      "condition": "Stroke",
+      "age": 23,
+      "condition": "flu",
       "patient_number": "1001",
-      "room_number": 44,
-      "procedures": [
-        {
-          "date": "2025-06-12",
-          "description": "Appendectomy",
-          "billed": true
-        }
-      ],
-      "billing": [
-        {
-          "amount": 1200.0,
-          "description": "Emergencies",
-          "paid": true
-        },
-        {
-          "amount": 100.0,
-          "description": "Procedure: Appendectomy on 2025-06-12",
-          "paid": false
-        },
-        {
-          "amount": 1200.0,
-          "description": "",
-          "paid": false
-        }
-      ],
-      "status": "normal"
-    },
-    {
-      "name": "ahmed",
-      "age": 34,
-      "condition": "Dehydration",
-      "patient_number": "1002",
+      "patient_next_of_kin": {
+        "name": "ahmed",
+        "number": "3274827483",
+        "email": "ahemd@gmail.com",
+        "relation": "father"
+      },
       "room_number": null,
+      "phone_number": "9238743443",
+      "date_of_birth": "2000-09-23",
+      "gender": "male",
+      "email": "sameer@gmail.com",
+      "address": "cairo, Egypr",
+      "identifier": "98538475835983",
       "procedures": [],
       "billing": [],
-      "status": "normal"
+      "status": "normal",
+      "register_date": "2025-06-20",
+      "discharge_date": null,
+      "date_of_death": null
+    },
+    {
+      "name": "foad",
+      "age": 44,
+      "condition": "flu",
+      "patient_number": "1002",
+      "patient_next_of_kin": {
+        "name": "loay ",
+        "number": "83494934",
+        "email": "loay@gmail.com",
+        "relation": "son"
+      },
+      "room_number": null,
+      "phone_number": "48398748",
+      "date_of_birth": "1984",
+      "gender": "male",
+      "email": "",
+      "address": "cairo, egypt",
+      "identifier": "39839849838943",
+      "procedures": [],
+      "billing": [],
+      "status": "normal",
+      "register_date": "2025-06-20",
+      "discharge_date": null,
+      "date_of_death": null
+    },
+    {
+      "name": "sameh",
+      "age": 20,
+      "condition": "flu",
+      "patient_number": "1003",
+      "patient_next_of_kin": {
+        "name": "",
+        "number": "",
+        "email": "",
+        "relation": ""
+      },
+      "room_number": null,
+      "phone_number": "040398598",
+      "date_of_birth": "2003-04-9",
+      "gender": "male",
+      "email": "sameh@gmail.com",
+      "address": "cairo, egypt",
+      "identifier": "9395839538583",
+      "procedures": [],
+      "billing": [],
+      "status": "normal",
+      "register_date": "2025-06-20",
+      "discharge_date": null,
+      "date_of_death": null
+    },
+    {
+      "name": "salma",
+      "age": 30,
+      "condition": "flu",
+      "patient_number": "1004",
+      "patient_next_of_kin": {
+        "name": "ahmed",
+        "number": "9328329839",
+        "email": "",
+        "relation": "father"
+      },
+      "room_number": null,
+      "phone_number": "98298239",
+      "date_of_birth": "200",
+      "gender": "female",
+      "email": "",
+      "address": "cairo",
+      "identifier": "89892892839",
+      "procedures": [],
+      "billing": [],
+      "status": "normal",
+      "register_date": "2025-06-20",
+      "discharge_date": null,
+      "date_of_death": null
+    },
+    {
+      "name": "gamal",
+      "age": 24,
+      "condition": "flu",
+      "patient_number": "1005",
+      "patient_next_of_kin": {
+        "name": "",
+        "number": "",
+        "email": "",
+        "relation": ""
+      },
+      "room_number": null,
+      "phone_number": "798298398",
+      "date_of_birth": "2000",
+      "gender": "male",
+      "email": "",
+      "address": "cairo",
+      "identifier": "98827376732823",
+      "procedures": [],
+      "billing": [],
+      "status": "normal",
+      "register_date": "2025-06-20",
+      "discharge_date": null,
+      "date_of_death": null
+    },
+    {
+      "name": "samar",
+      "age": 25,
+      "condition": "flu",
+      "patient_number": "1006",
+      "patient_next_of_kin": {
+        "name": "ahmed",
+        "number": "49834839",
+        "email": "",
+        "relation": "father"
+      },
+      "room_number": 44,
+      "phone_number": "849389479",
+      "date_of_birth": "1989",
+      "gender": "female",
+      "email": "",
+      "address": "cairo",
+      "identifier": "943984939",
+      "procedures": [],
+      "billing": [],
+      "status": "normal",
+      "register_date": "2025-06-20",
+      "discharge_date": null,
+      "date_of_death": null
     }
   ],
   "departments": {
-    "Emergency": {
+    "": {
       "patients": [],
       "staff": [
         {
           "name": "salem",
           "age": 45,
-          "position": "doctor"
-        },
-        {
-          "name": "farah",
-          "age": 30,
-          "position": "nurse"
+          "position": "93289328387433",
+          "phone_number": "doctor",
+          "date_of_birth": "8479348",
+          "gender": "1989",
+          "email": "male",
+          "address": "salem@gmail.com",
+          "identifier": "cairo, egypt"
         }
       ]
+    },
+    "surgery": {
+      "patients": [],
+      "staff": []
     }
   }
 }
